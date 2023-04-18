@@ -31,11 +31,12 @@
 #include <stdio.h>
 #define _XTAL_FREQ 8000000 
 
-const char data = 'T'; 
+//const char data = 'T'; 
 
 void setup(void);
 void initUART(void);
 
+void cadena(char txt[]); // Declaración de la función "cadena" 
 
 void __interrupt() isr(void){
     if(PIR1bits.RCIF)
@@ -47,8 +48,9 @@ void __interrupt() isr(void){
 void main (void){
     setup();
     initUART();
+    char texto[] = "Hola, pongame 100 :) \r"; // Cadena de caracteres a enviar
     
-    while(1){
+    /*while(1){
         __delay_ms(500);
         if (PIR1bits.TXIF)
         {
@@ -56,8 +58,21 @@ void main (void){
         PORTB = data; 
         }
         
-        }
+        }*/
+    while (1){
+        cadena(texto); // Llamada a la función "cadena"
+        __delay_ms(500);
     }
+}
+
+void cadena(char txt[]){
+    int i = 0;
+    while(txt[i] != '\0'){
+        while(!TXSTAbits.TRMT); // Esperamos a que el registro de transmisión esté vacío
+        TXREG = txt[i]; // Enviamos el caracter actual
+        i++;
+    }
+}
 
 void setup(void)
 {
